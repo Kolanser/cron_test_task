@@ -1,5 +1,10 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.contrib import admin
+
+HIGH = 'HIG'
+AVERAGE = 'AVG'
+LOW = 'LOW'
 
 
 class Question(models.Model):
@@ -58,13 +63,10 @@ class Category(models.Model):
 
 class Course(models.Model):
     """Модель курсов."""
-    HIGH = 'HIG'
-    AVERAGE = 'AVG'
-    LOW = 'LOW'
     LEVEL_CHOICES = [
-        (HIGH, 'High'),
-        (AVERAGE, 'Average'),
-        (LOW, 'Low')
+        (HIGH, 'Высокий'),
+        (AVERAGE, 'Средний'),
+        (LOW, 'Низкий')
     ]
     category = models.ForeignKey(
         'Category',
@@ -98,24 +100,29 @@ class Course(models.Model):
     audio = models.FileField(
         'Аудио к курсу',
         upload_to='courses/courses/',
-        blank=True
+        blank=True,
+
     )
     video = models.URLField(
         'Видео',
         help_text='Ссылка на видео',
         blank=True
     )
-    # @property
-    # def is_audio_course(self):
-    #     return bool(self.audio)
-    # @property
-    # def is_video_course(self):
-    #     return bool(self.video)
 
     class Meta:
         verbose_name = 'Курс'
         verbose_name_plural = 'Курсы'
         ordering = ['id', 'title',]
+
+    @property
+    @admin.display(description="Тип курса аудио?")
+    def is_audio_course(self):
+        return bool(self.video)
+
+    @property
+    @admin.display(description="Тип курса видео?")
+    def is_video_course(self):
+        return bool(self.video)
 
     def __str__(self):
         return self.title
