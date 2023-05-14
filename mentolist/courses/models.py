@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.contrib import admin
 
 HIGH = 'HIG'
@@ -126,3 +126,31 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class OfflineApplication(models.Model):
+    """Модель оффлайн-заявок."""
+    message_help = 'Номер телефона должен быть в формате +7(xxx)xx-xx-xx'
+    phone_number = models.CharField(
+        'Номер телефона',
+        max_length=17,
+        validators=[
+            RegexValidator(
+                r'^(\+7\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2})$',
+                message=message_help,
+            )
+        ],
+        help_text=message_help
+    )
+    name = models.CharField(
+        'Имя',
+        max_length=64,
+    )
+
+    class Meta:
+        verbose_name = 'Оффлайн-заявка'
+        verbose_name_plural = 'Оффлайн-заявки'
+        ordering = ['id', ]
+
+    def __str__(self):
+        return f'{self.name} - {self.phone_number}'

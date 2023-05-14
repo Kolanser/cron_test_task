@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from .models import Question, Category, Course, HIGH, AVERAGE, LOW
+from .models import Question, Category, Course, OfflineApplication, HIGH, AVERAGE, LOW
 
 
 class ImageDisplay(admin.ModelAdmin):
@@ -85,3 +85,10 @@ class CourseAdmin(ImageDisplay):
             )
         )
     color_level.short_description = 'Сложность курса'
+
+
+@admin.register(OfflineApplication)
+class OfflineApplicationAdmin(ImageDisplay):
+    """Админка оффлайн-заявок."""
+    list_display = ('name', 'phone_number', )
+    search_fields = ('name', 'phone_number', )
