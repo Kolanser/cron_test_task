@@ -5,6 +5,11 @@ from django.contrib import admin
 HIGH = 'HIG'
 AVERAGE = 'AVG'
 LOW = 'LOW'
+LEVEL_CHOICES = [
+    (HIGH, 'Высокий'),
+    (AVERAGE, 'Средний'),
+    (LOW, 'Низкий')
+]
 
 
 class Question(models.Model):
@@ -31,7 +36,7 @@ class Question(models.Model):
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
-        ordering = ['id', ]
+        ordering = ['number', ]
 
     def __str__(self):
         return self.text
@@ -63,11 +68,6 @@ class Category(models.Model):
 
 class Course(models.Model):
     """Модель курсов."""
-    LEVEL_CHOICES = [
-        (HIGH, 'Высокий'),
-        (AVERAGE, 'Средний'),
-        (LOW, 'Низкий')
-    ]
     category = models.ForeignKey(
         'Category',
         verbose_name='Категория',
@@ -101,7 +101,7 @@ class Course(models.Model):
         'Аудио к курсу',
         upload_to='courses/courses/',
         blank=True,
-
+        null=True
     )
     video = models.URLField(
         'Видео',
@@ -117,7 +117,7 @@ class Course(models.Model):
     @property
     @admin.display(description="Тип курса аудио?")
     def is_audio_course(self):
-        return bool(self.video)
+        return bool(self.audio)
 
     @property
     @admin.display(description="Тип курса видео?")
