@@ -45,7 +45,9 @@ class CourseRetrieveSerializer(serializers.ModelSerializer):
             'description',
             'time',
             'audio',
+            'audio_description',
             'video',
+            'video_description',
             'is_audio_course',
             'is_video_course'
         )

@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, RegexValidator
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 
 HIGH = 'HIG'
 AVERAGE = 'AVG'
@@ -100,14 +101,26 @@ class Course(models.Model):
     audio = models.FileField(
         'Аудио к курсу',
         upload_to='courses/courses/',
-        blank=True,
-        null=True
+        blank=True
+    )
+    audio_description = models.TextField(
+        'Описание аудиокурса',
+        help_text='Описание необходимо при добавлении аудиофайла',
+        max_length=2048,
+        blank=True
     )
     video = models.URLField(
         'Видео',
         help_text='Ссылка на видео',
         blank=True
     )
+    video_description = models.TextField(
+        'Описание видеокурса',
+        help_text='Описание необходимо при добавлении видеофайла',
+        max_length=2048,
+        blank=True
+    )
+    is_cleaned = False
 
     class Meta:
         verbose_name = 'Курс'
@@ -117,12 +130,29 @@ class Course(models.Model):
     @property
     @admin.display(description="Тип курса аудио?")
     def is_audio_course(self):
-        return bool(self.audio)
+        if self.audio:
+            return True
+        return False
 
     @property
     @admin.display(description="Тип курса видео?")
     def is_video_course(self):
-        return bool(self.video)
+        if self.video:
+            return True
+        return False
+
+    def clean(self):
+        self.is_cleaned = True
+        if self.audio and not self.audio_description:
+            raise ValidationError('Введите описание аудиокурса.')
+        if self.video and not self.video_description:
+            raise ValidationError('Введите описание видеокурса.')
+        return super().clean()
+
+    def save(self, *args, **kwargs):
+        if not self.is_cleaned:
+            self.full_clean()
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
@@ -130,7 +160,7 @@ class Course(models.Model):
 
 class OfflineApplication(models.Model):
     """Модель оффлайн-заявок."""
-    message_help = 'Номер телефона должен быть в формате +7(xxx)xx-xx-xx'
+    message_help = 'Номер телефона должен быть в формате +7(xxx)xxx-xx-xx'
     phone_number = models.CharField(
         'Номер телефона',
         max_length=17,

@@ -4,6 +4,7 @@ from .models import Question, Category, Course, OfflineApplication, HIGH, AVERAG
 
 
 class ImageDisplay(admin.ModelAdmin):
+    """Абстрактный класс для предпросмотра изображений."""
     def preview_image(self, obj):
         return mark_safe(
             f'<img src="{obj.image.url}" style="max-height: 100px;">'
@@ -60,7 +61,9 @@ class CourseAdmin(ImageDisplay):
         'color_level',
         'description',
         'audio',
+        'audio_description',
         'video',
+        'video_description',
         'preview_image',
         'is_audio_course',
         'is_video_course'
